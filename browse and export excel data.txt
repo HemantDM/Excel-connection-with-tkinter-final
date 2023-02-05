@@ -1,0 +1,45 @@
+import tkinter as tk
+import pandas as pd
+import os
+from tkinter import filedialog
+
+def browse_folder():
+    folder_path = filedialog.askdirectory()
+    path_entry.delete(0, tk.END)
+    path_entry.insert(0, folder_path)
+
+def create_df():
+    folder_path = path_entry.get()
+    excel_files = [f for f in os.listdir(folder_path) if f.endswith('_all.xlsx')]
+
+    df_list = []
+    for file in excel_files:
+        file_path = os.path.join(folder_path, file)
+        df = pd.read_excel(file_path)
+        df_list.append(df)
+        print(df)
+    return df_list
+
+def export_df():
+    export_folder = filedialog.askdirectory()
+    df_list = create_df()
+    for i, df in enumerate(df_list):
+        export_path = os.path.join(export_folder, f"dataframe_{i}.xlsx")
+        df.to_excel(export_path, index=False)
+
+root = tk.Tk()
+root.title("Folder Browser")
+
+browse_button = tk.Button(root, text="Browse Input Folder", command=browse_folder)
+browse_button.pack()
+
+path_entry = tk.Entry(root)
+path_entry.pack()
+
+create_df_button = tk.Button(root, text="Create DataFrame", command=create_df)
+create_df_button.pack()
+
+export_df_button = tk.Button(root, text="Export DataFrame", command=export_df)
+export_df_button.pack()
+
+root.mainloop()
